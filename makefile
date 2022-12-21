@@ -1,5 +1,5 @@
 test_result.o: test.c heap.h
-	gcc -g -Wall -pedantic $^ -o $@
+	gcc -g -Wall -pedantic $< -o $@
 
 .PHONY: clean
 
