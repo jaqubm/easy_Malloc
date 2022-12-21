@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "heap.h"
 
-//struct memory_manager_t memory_manager;
-
 int UTEST1(void);
 int UTEST2(void);
 int UTEST3(void);
