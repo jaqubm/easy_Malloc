@@ -57,7 +57,7 @@ int main(void)
     return 0;
 }
 
-//  Test 1: Sprawdzanie poprawności działania funkcji memory_init
+//  Test 1: Checking functionality of memory_init
 int UTEST1(void)
 {
     char memory[1732];
@@ -71,7 +71,7 @@ int UTEST1(void)
     return 0;
 }
 
-//  Test 2: Sprawdzanie poprawności działania funkcji memory_malloc
+//  Test 2: Checking functionality of memory_malloc
 int UTEST2(void)
 {
     char memory[1436];
@@ -96,7 +96,7 @@ int UTEST2(void)
     return 0;
 }
 
-//  Test 3: Sprawdzanie poprawności działania funkcji memory_malloc
+//  Test 3: Checking functionality of memory_malloc
 int UTEST3(void)
 {
     char memory[1249];
@@ -114,7 +114,7 @@ int UTEST3(void)
     return 0;
 }
 
-//  Test 4: Sprawdzanie poprawności działania funkcji memory_malloc
+//  Test 4: Checking functionality of memory_malloc
 int UTEST4(void)
 {
     char memory[1838];
@@ -132,7 +132,7 @@ int UTEST4(void)
     return 0;
 }
 
-//  Test 5: Sprawdzanie poprawności działania funkcji memory_malloc
+//  Test 5: Checking functionality of memory_malloc
 int UTEST5(void)
 {
     char memory[13697];
