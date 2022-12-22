@@ -14,6 +14,8 @@ int UTEST10(void);
 int UTEST11(void);
 int UTEST12(void);
 int UTEST13(void);
+int UTEST14(void);
+int UTEST15(void);
 
 int main(void)
 {
@@ -371,3 +373,5 @@ int UTEST10(void);
 int UTEST11(void);
 int UTEST12(void);
 int UTEST13(void);
+int UTEST14(void);
+int UTEST15(void);
