@@ -84,6 +84,27 @@ int main(void)
     } 
     else printf("UTEST9 Passed\n");
 
+    if(UTEST10() == -1)
+    {
+        printf("\nUTEST10 Failed\n\nTests Failed\n");
+        return -1;
+    } 
+    else printf("UTEST10 Passed\n");
+
+    if(UTEST11() == -1)
+    {
+        printf("\nUTEST11 Failed\n\nTests Failed\n");
+        return -1;
+    } 
+    else printf("UTEST11 Passed\n");
+
+    if(UTEST12() == -1)
+    {
+        printf("\nUTEST12 Failed\n\nTests Failed\n");
+        return -1;
+    } 
+    else printf("UTEST12 Passed\n");
+
     printf("\nAll Tests Passed Successfully\n\n");
 
     return 0;
@@ -369,9 +390,127 @@ int UTEST9(void)
     return 0;
 }
 
-int UTEST10(void);
-int UTEST11(void);
-int UTEST12(void);
+//  Test 10: Testing functionality of memory_malloc
+int UTEST10(void)
+{
+    char memory[716];
+
+    size_t mem_sizes[] = {111, 200, 145, 132};
+
+    memory_init(memory, 716);
+
+    if(memory_manager.memory_size != 716) return -1;
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+    if(memory_manager.memory_start != memory) return -1;
+
+    char *ptr[4];
+
+    for(int i=0; i<4; i++)
+    {
+        ptr[i] = memory_malloc(mem_sizes[i]);
+        if(ptr[i] == NULL) return -1;
+    }
+
+    memory_free(ptr[0]);
+    memory_free(ptr[2]);
+
+    struct memory_chunk_t *curr_chunk = memory_manager.first_memory_chunk;
+
+    for(int i=0; i<4; i++)
+    {
+        if(curr_chunk->size != mem_sizes[i]) return -1;
+        if(curr_chunk->free != !(i % 2)) return -1;
+        if ((i == 3 && curr_chunk->next != NULL) || (i != 3 && curr_chunk->next == NULL)) return -1;
+        if ((i == 0 && curr_chunk->prev != NULL) || (i != 0 && curr_chunk->prev == NULL)) return -1;
+
+        curr_chunk = curr_chunk->next;
+    }
+
+    memory_free(ptr[1]);
+
+    if(memory_manager.first_memory_chunk == NULL) return -1;
+    if((char *)memory_manager.first_memory_chunk == ptr[0]) return -1;
+    if((char *)memory_manager.first_memory_chunk != ptr[0] - sizeof(struct memory_chunk_t)) return -1;
+    if(memory_manager.first_memory_chunk->size != 520) return -1;
+    if(memory_manager.first_memory_chunk->free != 1) return -1;
+    if((char *)memory_manager.first_memory_chunk->next != ptr[3] - sizeof(struct memory_chunk_t)) return -1;
+    if(memory_manager.first_memory_chunk->prev != NULL) return -1;
+
+    return 0;
+}
+
+//  Test 11: Testing functionality of memory_malloc
+int UTEST11(void)
+{
+    char memory[489];
+
+    size_t mem_sizes[] = {106, 136, 151};
+
+    memory_init(memory, 489);
+
+    if(memory_manager.memory_size != 489) return -1;
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+    if(memory_manager.memory_start != memory) return -1;
+
+    char *ptr[3];
+
+    for(int i=0; i<3; i++)
+    {
+        ptr[i] = memory_malloc(mem_sizes[i]);
+        if(ptr[i] == NULL) return -1;
+    }
+
+    memory_free(ptr[1]);
+
+    struct memory_chunk_t *curr_chunk = memory_manager.first_memory_chunk;
+
+    for(int i=0; i<3; i++)
+    {
+        if(curr_chunk->size != mem_sizes[i]) return -1;
+        if(curr_chunk->free != (i % 2)) return -1;
+        if ((i == 2 && curr_chunk->next != NULL) || (i != 2 && curr_chunk->next == NULL)) return -1;
+        if ((i == 0 && curr_chunk->prev != NULL) || (i != 0 && curr_chunk->prev == NULL)) return -1;
+
+        curr_chunk = curr_chunk->next;
+    }
+
+    memory_free(ptr[2]);
+
+    if(memory_manager.first_memory_chunk == NULL) return -1;
+    if((char *)memory_manager.first_memory_chunk->next != NULL) return -1;
+
+    return 0;
+}
+
+//  Test 12: Testing functionality of memory_malloc
+int UTEST12(void)
+{
+    char memory[378];
+
+    size_t mem_sizes[] = {199, 115};
+
+    memory_init(memory, 378);
+
+    if(memory_manager.memory_size != 378) return -1;
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+    if(memory_manager.memory_start != memory) return -1;
+
+    char *ptr[2];
+
+    for(int i=0; i<2; i++)
+    {
+        ptr[i] = memory_malloc(mem_sizes[i]);
+        if(ptr[i] == NULL) return -1;
+    }
+
+    memory_free(ptr[0]);
+    memory_free(ptr[1]);
+
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+
+    return 0;
+}
+
 int UTEST13(void);
 int UTEST14(void);
 int UTEST15(void);
