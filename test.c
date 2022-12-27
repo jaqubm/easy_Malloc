@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "heap.h"
 
 int UTEST1(void);
@@ -104,6 +106,27 @@ int main(void)
         return -1;
     } 
     else printf("UTEST12 Passed\n");
+
+    if(UTEST13() == -1)
+    {
+        printf("\nUTEST13 Failed\n\nTests Failed\n");
+        return -1;
+    } 
+    else printf("UTEST13 Passed\n");
+
+    if(UTEST14() == -1)
+    {
+        printf("\nUTEST14 Failed\n\nTests Failed\n");
+        return -1;
+    } 
+    else printf("UTEST14 Passed\n");
+
+    if(UTEST15() == -1)
+    {
+        printf("\nUTEST15 Failed\n\nTests Failed\n");
+        return -1;
+    } 
+    else printf("UTEST15 Passed\n");
 
     printf("\nAll Tests Passed Successfully\n\n");
 
@@ -511,6 +534,157 @@ int UTEST12(void)
     return 0;
 }
 
-int UTEST13(void);
-int UTEST14(void);
-int UTEST15(void);
+//  Test 13: Testing functionality of memory_malloc
+int UTEST13(void)
+{
+    char memory[765];
+
+    size_t mem_sizes[] = {155, 199, 108, 175};
+    size_t mem_sizes_2[] = {155, 94, 108, 175};
+
+    memory_init(memory, 765);
+
+    if(memory_manager.memory_size != 765) return -1;
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+    if(memory_manager.memory_start != memory) return -1;
+
+    char *ptr[4];
+
+    for(int i=0; i<4; i++)
+    {
+        ptr[i] = memory_malloc(mem_sizes[i]);
+        if(ptr[i] == NULL) return -1;
+    }
+
+    struct memory_chunk_t *curr_chunk = memory_manager.first_memory_chunk;
+
+    for(int i=0; i<4; i++)
+    {
+        if(curr_chunk->size != mem_sizes[i]) return -1;
+        if(curr_chunk->free != 0) return -1;
+        if ((i == 3 && curr_chunk->next != NULL) || (i != 3 && curr_chunk->next == NULL)) return -1;
+        if ((i == 0 && curr_chunk->prev != NULL) || (i != 0 && curr_chunk->prev == NULL)) return -1;
+
+        curr_chunk = curr_chunk->next;
+    }
+
+    memory_free(ptr[1]);
+    ptr[1] = memory_malloc(94);
+
+    curr_chunk = memory_manager.first_memory_chunk;
+
+    for(int i=0; i<4; i++)
+    {
+        if(curr_chunk->size != mem_sizes_2[i]) return -1;
+        if(curr_chunk->free != 0) return -1;
+        if ((i == 3 && curr_chunk->next != NULL) || (i != 3 && curr_chunk->next == NULL)) return -1;
+        if ((i == 0 && curr_chunk->prev != NULL) || (i != 0 && curr_chunk->prev == NULL)) return -1;
+
+        curr_chunk = curr_chunk->next;
+    }
+
+    memory_free(ptr[1]);
+
+    curr_chunk = memory_manager.first_memory_chunk;
+
+    for(int i=0; i<4; i++)
+    {
+        if(curr_chunk->size != mem_sizes[i]) return -1;
+        if(curr_chunk->free != (i == 1)) return -1;
+        if ((i == 3 && curr_chunk->next != NULL) || (i != 3 && curr_chunk->next == NULL)) return -1;
+        if ((i == 0 && curr_chunk->prev != NULL) || (i != 0 && curr_chunk->prev == NULL)) return -1;
+
+        curr_chunk = curr_chunk->next;
+    }
+
+    return 0;
+}
+
+//  Test 14: Testing functionality of memory_free
+int UTEST14(void)
+{
+    char memory[172];
+
+    memory_init(memory, 172);
+
+    char *ptr = memory_malloc(16);
+
+    memory_free(ptr + 1);
+    memory_free(ptr - 1);
+    memory_free(ptr - sizeof(struct memory_chunk_t));
+
+    if(ptr == NULL) return -1;
+    if(memory_manager.first_memory_chunk == NULL) return -1;
+    if((char *)memory_manager.first_memory_chunk == ptr) return -1;
+    if((char *)memory_manager.first_memory_chunk != ptr - sizeof(struct memory_chunk_t)) return -1;
+    if(memory_manager.first_memory_chunk->size != 16) return -1;
+    if(memory_manager.first_memory_chunk->free != 0) return -1;
+    if(memory_manager.first_memory_chunk->next != NULL) return -1;
+    if(memory_manager.first_memory_chunk->prev != NULL) return -1;
+
+    memory_free(ptr);
+
+    if(memory_manager.memory_size != 172) return -1;
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+    if(memory_manager.memory_start != memory) return -1;
+
+    return 0;
+}
+
+//  Test 15: Testing functionality of memory_malloc
+int UTEST15(void)
+{
+    srand(time(NULL));
+
+    char memory[73554];
+
+    char *ptr[290];
+    int ptr_state[290] = {0};
+
+    int is_allocated = 0;
+
+    memory_init(memory, 73554);
+
+    for(int i=0; i<290; i++)
+    {
+        if(rand() % 100 < 66)
+        {
+            for(int j=0; j<290; j++)
+            {
+                if(ptr_state[j] == 0)
+                {
+                    ptr[j] = memory_malloc(rand() % 100 + 50);
+                    ptr_state[j] = 1;
+                    is_allocated++;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if(is_allocated)
+            {
+                int to_free = rand() % is_allocated;
+
+                for(int j=0; j<290; j++)
+                {
+                    if(ptr_state[j] == 1 && !(to_free--))
+                    {
+                        memory_free(ptr[j]);
+                        ptr_state[j] = 0;
+                        is_allocated--;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    for(int j=0; j<290; j++)
+        if(ptr_state[j] == 1)
+            memory_free(ptr[j]);
+
+    if(memory_manager.first_memory_chunk != NULL) return -1;
+
+    return 0;
+}
