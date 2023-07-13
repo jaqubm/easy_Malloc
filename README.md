@@ -1,6 +1,6 @@
 # easy_Malloc
 
-Program in C that imitates malloc() and free() in a simplified way along with tests of these functions
+Program in C that imitates malloc() and free() in a simplified way along with tests of those functions
 
 ## Build
 
