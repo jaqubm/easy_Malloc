@@ -1,4 +1,4 @@
-test_results.o: test.c heap.h
+test_results.o: main.c heap.h
 	gcc -g -Wall -pedantic $< -o $@
 
 .PHONY: clean
